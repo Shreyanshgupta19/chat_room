@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "45228425201",
+    "project_id": "chat-room-4fb96",
+    "storage_bucket": "chat-room-4fb96.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45228425201:android:334c38533daea8eef68e50",
+        "android_client_info": {
+          "package_name": "com.shreyansh.chat_room"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "45228425201-eihb3jem9eqjha4n7japs75tuafssaaf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjUL8mcGK95j1lLDSIaOj9KTIzr2jiVSI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "45228425201-eihb3jem9eqjha4n7japs75tuafssaaf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

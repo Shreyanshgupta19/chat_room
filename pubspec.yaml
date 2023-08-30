@@ -41,6 +41,11 @@ dependencies:
   font_awesome_flutter: ^10.4.0
   lottie:
   flutter_svg:
+  firebase_core:     # firebase
+  firebase_storage:
+  firebase_auth:
+  cloud_firestore:    # firebase
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

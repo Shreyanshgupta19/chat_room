@@ -17,6 +17,12 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 class otpverification extends StatefulWidget {
   const otpverification({super.key});
@@ -26,6 +32,16 @@ class otpverification extends StatefulWidget {
 }
 
 class _otpverificationState extends State<otpverification> {
+
+  final _formKey = GlobalKey<FormState>();
+
+  final _otpController = TextEditingController();
+  void dispose_a (){
+
+    _otpController.dispose();
+    super.dispose();
+  }
+
 
   int _remainingTime = 60;
   late Timer _timer;
@@ -81,7 +97,7 @@ class _otpverificationState extends State<otpverification> {
       startTimer();
     }
   }
-  void dipose(){
+  void dispose_b (){
     _timer.cancel();    // it removes the Timer.periodic method
     super.dispose();
     }
@@ -101,137 +117,157 @@ class _otpverificationState extends State<otpverification> {
           body: SingleChildScrollView(
             physics: BouncingScrollPhysics(),
             child: Center(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 0,bottom: 0),
-                    child: Lottie.asset("assets/animations/otpanimation.json",
-                        height: 340,
-                      width: 340
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0,bottom: 0),
+                      child: Lottie.asset("assets/animations/otpanimation.json",
+                          height: 340,
+                        width: 340
 
+                      ),
                     ),
-                  ),
-                  Container(
-                    height: 330,
-                    width: 340,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(width: 2,color: Colors.white,),
-                    ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20,bottom: 4,left: 0,right: 0),
-                          child: Container(
-                            width: 200,
-                            child: Column(
-                              children: [
-                                TextFormField(
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(4),
-                                    FilteringTextInputFormatter.digitsOnly,
-                                  ],
-                                  decoration: InputDecoration(
-                                      hintText: "Enter otp",
-                                      hintStyle: TextStyle(fontStyle: FontStyle.italic,fontWeight: FontWeight.w400,),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(21),
-                                        borderSide: BorderSide(
-                                          color: Colors.blue,
-                                          width: 1,
-                                        )
-                                    ),
-                                    disabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(21),
-                                        borderSide: BorderSide(
-                                          color: Colors.black,
-                                          width: 1,
-                                        )
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(21),
-                                        borderSide: BorderSide(
-                                          color: Colors.white,
-                                          width: 1,
-                                        )
+                    Container(
+                      height: 380,
+                      width: 340,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(width: 2,color: Colors.white,),
+                      ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20,bottom: 4,left: 0,right: 0),
+                            child: Container(
+                              width: 200,
+                              child: Column(
+                                children: [
+                                  TextFormField(
+                                    controller: _otpController,
+                                    validator: (value){
+                                      if( value!.isEmpty){
+                                        return "Please enter otp";
+                                      }if(value.length < 4 ){
+                                        return "Please enter valid otp";
+                                      }
+                                      else{
+                                        return null;
+                                      }
+                                    },
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.center,
+                                    inputFormatters: [
+                                      LengthLimitingTextInputFormatter(4),
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    decoration: InputDecoration(
 
+                                      errorStyle: TextStyle(color: Colors.blue,),  // error text color
+                                      errorBorder: OutlineInputBorder(             // error textfield border
+                                          borderRadius: BorderRadius.circular(21),
+                                          borderSide: BorderSide(
+                                            color: Colors.red,
+                                            width: 1,
+                                          ),
+
+                                      ),
+                                      disabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(21),
+                                          borderSide: BorderSide(
+                                            color: Colors.black,
+                                            width: 1,
+                                          )
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(21),
+                                          borderSide: BorderSide(
+                                            color: Colors.white,
+                                            width: 1,
+                                          )
+
+                                      ),
+                                    ),
+
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 18,bottom: 0,left: 0,right: 0),
+                                    child: Text("Enter your OTP code here",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: FontStyle.italic,
+                                        fontSize: 15,
+                                      ),
                                     ),
                                   ),
 
+                                ],
+                              ),
+
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 25,bottom: 0,left: 0,right: 0),
+                            child: SizedBox(
+                              height: 60,
+                              width: 320,
+                              child: ElevatedButton(
+                                onPressed: _isLoading ? null
+                                    :(){
+                                  if( _formKey.currentState!.validate() ) {
+                                    _handleLock();
+                                }
+                                     },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+
+                                  ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 18,bottom: 0,left: 0,right: 0),
-                                  child: Text("Enter your OTP code here",
+                                child: _isLoading
+                                  ? CircularProgressIndicator()
+                                    : Text("Verify"),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 18,bottom: 0,left: 0,right: 0),
+                            child: Column(
+                              children: [
+                                Text("Did't receive the verification code?",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                Text( formatTime(_remainingTime),
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                                TextButton(
+                                  onPressed: resendOtp,
+                                  child: Text("Resend again",
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.blue,
                                       fontWeight: FontWeight.bold,
                                       fontStyle: FontStyle.italic,
                                       fontSize: 15,
                                     ),
                                   ),
                                 ),
-
                               ],
                             ),
-
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 25,bottom: 0,left: 0,right: 0),
-                          child: SizedBox(
-                            height: 60,
-                            width: 320,
-                            child: ElevatedButton(
-                              onPressed: _isLoading ? null : _handleLock,
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-
-                                ),
-                              ),
-                              child: _isLoading
-                                ? CircularProgressIndicator()
-                                  : Text("Verify"),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 18,bottom: 0,left: 0,right: 0),
-                          child: Column(
-                            children: [
-                              Text("Did't receive the verification code?",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FontStyle.italic,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              Text( formatTime(_remainingTime),
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              TextButton(
-                                onPressed: resendOtp,
-                                child: Text("Resend again",
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.italic,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
