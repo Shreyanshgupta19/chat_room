@@ -45,6 +45,9 @@ dependencies:
   firebase_storage:
   firebase_auth:
   cloud_firestore:    # firebase
+  country_picker:
+  get:
+  pinput:
 
 dev_dependencies:
   flutter_test:

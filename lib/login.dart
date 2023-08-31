@@ -1,5 +1,6 @@
 import 'package:chat_room/Home.dart';
 import 'package:chat_room/SplashScreen.dart';
+import 'package:chat_room/Utils/utils.dart';
 import 'package:chat_room/VideoCalls.dart';
 import 'package:chat_room/VoiceCalls.dart';
 import 'package:chat_room/entermobilenumber.dart';
@@ -34,6 +35,24 @@ class _loginState extends State<login> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  final _auth = FirebaseAuth.instance;
+  void login(){
+  _auth.signInWithEmailAndPassword(
+      email: emailController.text,
+      password: passwordController.text
+                                  ).then((value){
+                                    setState(() {
+                                      _isLoading3 = false;
+                                    });
+
+  }
+  ).onError((error, stackTrace) {
+  Utils().toastMessage( error.toString() );
+  setState(() {
+    _isLoading3 = false;
+  });
+  });
+}
   void dispose(){
     super.dispose();
     emailController.dispose();
@@ -55,7 +74,7 @@ class _loginState extends State<login> {
     setState(() {
       _isloading0 = true;
       Future.delayed(Duration(seconds: 2),
-              (){
+              (){ //login();
             setState(() {
               _isloading0 = false;
               Navigator.push(context, MaterialPageRoute(builder: (context){return entermobilenumber();}));
@@ -66,19 +85,7 @@ class _loginState extends State<login> {
   }
 
   bool _isLoading1 = false;
-  void _handleClick1 () {
-    setState(() {
-      _isLoading1 = true;
-      Future.delayed(Duration(seconds: 2),
-              (){
-            setState(() {
-              _isLoading1 = false;
-              Navigator.push(context, MaterialPageRoute(builder: (context){return MyHomePage(title: 'Chat Room');;}));
-            });
-          }
-      );
-    });
-  }
+
 
   bool _isLoading2 = false;
   void _handleClick2 () {
@@ -251,13 +258,31 @@ class _loginState extends State<login> {
                            width: 320,
                            child: ElevatedButton(
                              onPressed: _isLoading1?null
-                              : (){
+                                 : (){
                                if( _formKey.currentState!.validate() ){
                                  // If the form is valid, you can proceed with your logic here
-                                 _handleClick1();
+                                 setState(() {
+                                   _isLoading1 = true;
+                                 });
+                                 _auth.createUserWithEmailAndPassword(
+                                   email: emailController.text.toString(),
+                                   password: passwordController.text.toString(),
+                                 ).then((value) {
+                                   setState(() {
+                                     _isLoading1 = false;
+                                     Navigator.push(context, MaterialPageRoute(builder: (context){return MyHomePage(title: 'Chat Room');;}));
 
+                                   });
+                                 }).onError((error, stackTrace) {
+                                   Utils().toastMessage( error.toString() );
+                                   setState(() {
+                                     _isLoading1 = false;
+                                   });
+
+                                 });
                                }
-                               },
+                             },
+
                              child:_isLoading1?CircularProgressIndicator()
                                    : Text("Log In"),
                              style: ElevatedButton.styleFrom(
@@ -283,7 +308,7 @@ class _loginState extends State<login> {
                        )
                      ],
                    ),
-),
+               ),
              ),
 
           Padding(
@@ -300,6 +325,7 @@ class _loginState extends State<login> {
                padding: const EdgeInsets.all(8.0),
                child: InkWell(
                    onTap: _isLoading3?null:_handleClick3,
+
                    child: _isLoading3?CircularProgressIndicator()
                      : Container(
                      height: 50,

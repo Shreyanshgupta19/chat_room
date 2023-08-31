@@ -25,7 +25,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 
 class otpverification extends StatefulWidget {
-  const otpverification({super.key});
+  final verificationId;
+  const otpverification({Key? key , required this.verificationId}) : super(key: key);
 
   @override
   State<otpverification> createState() => _otpverificationState();

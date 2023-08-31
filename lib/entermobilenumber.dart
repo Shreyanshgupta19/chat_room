@@ -1,5 +1,6 @@
 import 'package:chat_room/Home.dart';
 import 'package:chat_room/SplashScreen.dart';
+import 'package:chat_room/Utils/utils.dart';
 import 'package:chat_room/VideoCalls.dart';
 import 'package:chat_room/VoiceCalls.dart';
 import 'package:chat_room/enteremail.dart';
@@ -33,6 +34,8 @@ class entermobilenumber extends StatefulWidget {
 
 class _entermobilenumberState extends State<entermobilenumber> {
 
+  final _auth = FirebaseAuth.instance;
+
   final _formKey = GlobalKey<FormState>();
 
   final numbercontroller = TextEditingController();
@@ -46,19 +49,19 @@ class _entermobilenumberState extends State<entermobilenumber> {
 
   bool _isLoading = false;
 
-  void _handleClick (){
-    setState(() {
-      _isLoading = true;
-      Future.delayed(Duration(seconds: 2),
-          (){
-        setState(() {
-          _isLoading = false;
-          Navigator.push(context, MaterialPageRoute(builder: (context){return otpverification();}));
-        });
-          }
-      );
-    });
-  }
+  // void _handleClick (){
+  //   setState(() {
+  //     _isLoading = true;
+  //     Future.delayed(Duration(seconds: 2),
+  //         (){
+  //       setState(() {
+  //         _isLoading = false;
+  //         Navigator.push(context, MaterialPageRoute(builder: (context){return otpverification();}));
+  //       });
+  //         }
+  //     );
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +156,38 @@ children: [
                     : (){
                   if( _formKey.currentState!.validate() ){
                     // If the form is valid, you can proceed with your logic here
-                    _handleClick();
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    _auth.verifyPhoneNumber(
+                        phoneNumber: numbercontroller.text.toString(),
+                      verificationCompleted: (_){
+
+                      },
+                      verificationFailed: (e){
+                          Utils().toastMessage( e.toString() );
+                      },
+                      codeSent: ( String verificationId  , int? token){
+                   Navigator.push(context, MaterialPageRoute(builder: (context){return otpverification(verificationId: verificationId,);}));
+
+                      },
+                      codeAutoRetrievalTimeout: (e){
+                          Utils().toastMessage( e.toString() );
+                      }
+                                         );
+                    //     .then((value) {
+                    //   setState(() {
+                    //     _isLoading = false;
+                    //     Navigator.push(context, MaterialPageRoute(builder: (context){return MyHomePage(title: 'Chat Room');;}));
+                    //
+                    //   });
+                    // }).onError((error, stackTrace) {
+                    //   Utils().toastMessage( error.toString() );
+                    //   setState(() {
+                    //     _isLoading = false;
+                    //   });
+                    //
+                    // });
                   }
                 },
                 style: ElevatedButton.styleFrom(
